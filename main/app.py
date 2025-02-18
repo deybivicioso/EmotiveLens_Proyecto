@@ -66,8 +66,6 @@ button_frame.pack(pady=10)
 about_button = create_round_button(button_frame, text="ACERCA DE", bg="#c53434", fg="white", command= open_acercade)
 survey_button = create_round_button(button_frame, text="INICIAR ENCUESTA", bg="#16cd7b", fg="white")
 
-
-
 about_button.pack(side="left", padx=200, pady=100)
 survey_button.pack(side="right", padx=200, pady=100)
 
