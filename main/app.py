@@ -1,11 +1,35 @@
 import tkinter as tk
+from tkinter import ttk
 from PIL import Image, ImageTk
+from pygrabber.dshow_graph import FilterGraph
 import subprocess
 import sys
 from pathlib import Path
 
 # Obtener la carpeta principal del proyecto
 project_root = Path(__file__).resolve().parent.parent  # Subir al directorio raíz del proyecto
+
+# Función para obtener la lista de cámaras disponibles con sus nombres
+def get_camera_list():
+    graph = FilterGraph()
+    return graph.get_input_devices()  # Retorna una lista con los nombres de las cámaras
+
+# Función para alternar entre modo oscuro y claro
+def toggle_theme():
+    global dark_mode
+    dark_mode = not dark_mode
+    apply_theme()
+
+# Aplicar tema oscuro o claro
+def apply_theme():
+    if dark_mode:
+        root.configure(bg="#2E2E2E")
+        top_bar.configure(bg="#1C1C1C")
+        settings_button.configure(bg="#444", fg="white")
+    else:
+        root.configure(bg="white")
+        top_bar.configure(bg="#7a98b2")
+        settings_button.configure(bg="#ccc", fg="black")
 
 # Creación de la ventana
 root = tk.Tk()
@@ -14,9 +38,39 @@ root.geometry("400x500")
 root.configure(bg="white")
 root.attributes('-alpha', 0)
 
+dark_mode = False  # Estado inicial del tema
+
 # Barra superior
 top_bar = tk.Frame(root, bg="#7a98b2", height=50)
 top_bar.pack(fill="x")
+
+# Botón de configuración
+def open_settings():
+    config_window = tk.Toplevel()
+    config_window.title("Configuración")
+    config_window.geometry("400x300")
+
+    # Modo oscuro/claro
+    tk.Label(config_window, text="Modo:").pack(pady=5)
+    theme_button = tk.Button(config_window, text="Alternar Modo", command=toggle_theme)
+    theme_button.pack(pady=5)
+    
+    # Selección de cámara
+    tk.Label(config_window, text="Seleccionar Cámara:").pack(pady=5)
+    camera_var = tk.StringVar()
+    camera_list = get_camera_list()
+
+    if camera_list:
+        camera_dropdown = ttk.Combobox(config_window, textvariable=camera_var, values=camera_list, state="readonly")
+        camera_dropdown.pack(pady=5)
+        camera_dropdown.current(0)  # Selecciona la primera cámara por defecto
+    else:
+        tk.Label(config_window, text="No se encontraron cámaras").pack()
+
+    config_window.mainloop()
+
+settings_button = tk.Button(top_bar, text="⚙", font=("Arial", 12), bg="#ccc", fg="black", command=open_settings)
+settings_button.pack(side="left", padx=5, pady=5)
 
 # Mostrar el logo
 image_path = project_root / "assets" / "img" / "Emotive lens logo.png"  # Ruta correcta para la imagen
@@ -76,8 +130,9 @@ def create_round_button(parent, text, bg, fg, command=None):
 about_button = create_round_button(button_frame, text="ACERCA DE", bg="#c53434", fg="white", command=open_acercade)
 survey_button = create_round_button(button_frame, text="INICIAR ENCUESTA", bg="#16cd7b", fg="white")
 
-about_button.pack(side="left", padx=40, pady=100)
-survey_button.pack(side="right", padx=40, pady=100)
 
-# Ejecutar la app
+about_button.pack(side="left", padx=200, pady=100)
+survey_button.pack(side="right", padx=200, pady=100)
+
+#Ejecutar la app
 root.mainloop()
