@@ -76,16 +76,8 @@ def create_round_button(parent, text, bg, fg, command=None):
 about_button = create_round_button(button_frame, text="ACERCA DE", bg="#c53434", fg="white", command=open_acercade)
 survey_button = create_round_button(button_frame, text="INICIAR ENCUESTA", bg="#16cd7b", fg="white")
 
-<<<<<<< HEAD
-about_button.pack(side="left", padx=200, pady=100)
-survey_button.pack(side="right", padx=200, pady=100)
-
-#Ejecutar la app
-root.mainloop()
-=======
 about_button.pack(side="left", padx=40, pady=100)
 survey_button.pack(side="right", padx=40, pady=100)
 
 # Ejecutar la app
 root.mainloop()
->>>>>>> 7d05b164fbe34421cfda91711fefa1dd7af7ed4c
