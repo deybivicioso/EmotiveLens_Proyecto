@@ -1,6 +1,7 @@
 import tkinter as tk
 from PIL import Image, ImageTk  
 
+
 developers = [
     {
         "name": "Deybi Jesus Vicioso Rodriguez",

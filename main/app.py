@@ -6,7 +6,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-# Obtener la carpeta principal del proyecto
+  # Obtener la carpeta principal del proyecto
 project_root = Path(__file__).resolve().parent.parent  # Subir al directorio raíz del proyecto
 
 # Función para obtener la lista de cámaras disponibles con sus nombres
@@ -15,6 +15,7 @@ def get_camera_list():
     return graph.get_input_devices()  # Retorna una lista con los nombres de las cámaras
 
 # Función para alternar entre modo oscuro y claro
+dark_mode = False  
 def toggle_theme():
     global dark_mode
     dark_mode = not dark_mode
