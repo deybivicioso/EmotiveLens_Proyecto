@@ -4,7 +4,7 @@ from tkinter import messagebox
 # Creación de la ventana de preguntas
 root = tk.Tk()
 root.title("Encuesta de eficiencia de servicio")
-root.geometry("400x400")
+root.geometry("500x500")
 root.configure(bg="#7A98B2")
 
 # Preguntas de la encuesta de satisfacción: 
