@@ -57,8 +57,6 @@ for i in range(0, len(developers), 2):
             bio_label = tk.Label(card, text=dev["bio"], font=("Arial", 10), wraplength=250, fg="white", bg="#16CD7B")
             bio_label.pack()
 
-
-
 def create_round_button(parent, text, bg, fg):
     button = tk.Button(parent, text=text, font=("Arial", 12, "bold"), bg=bg, fg=fg, padx=20, pady=10,
                        borderwidth=0, relief="flat")

@@ -102,6 +102,10 @@ def open_acercade():
     acercade_path = project_root / "main" / "acercade.py"  # Ruta correcta para acercade.py
     subprocess.run([sys.executable, str(acercade_path)])
 
+def open_iniciarencuesta():
+    iniciarencuesta_path = project_root / "main" / "seleccion.py" # Ruta correcta para seleccion.py
+    subprocess.run([sys.executable, str(iniciarencuesta_path)])
+
 # Inicio de animación 
 fade_in()
 
@@ -129,7 +133,7 @@ def create_round_button(parent, text, bg, fg, command=None):
 
 # Crear botones
 about_button = create_round_button(button_frame, text="ACERCA DE", bg="#c53434", fg="white", command=open_acercade)
-survey_button = create_round_button(button_frame, text="INICIAR ENCUESTA", bg="#16cd7b", fg="white")
+survey_button = create_round_button(button_frame, text="INICIAR ENCUESTA", bg="#16cd7b", fg="white", command=open_iniciarencuesta)
 
 
 about_button.pack(side="left", padx=200, pady=100)
