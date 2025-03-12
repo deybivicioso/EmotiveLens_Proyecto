@@ -1,5 +1,25 @@
-import tkinter as tk 
-from tkinter import messagebox 
+import tkinter as tk
+from tkinter import messagebox
+import subprocess
+import sys
+from pathlib import Path
+
+# Obtener la carpeta principal del proyecto
+project_root = Path(__file__).resolve().parent.parent
+
+# Función para validar las respuestas antes de avanzar
+def validar_y_abrir_siguiente():
+    nombre = entry_nombre.get().strip()
+    correo = entry_correo.get().strip()
+    telefono = entry_telefono.get().strip()
+    
+    if not (nombre and correo and telefono and pregunta1_var.get() and pregunta2_var.get() and pregunta3_var.get()):
+        messagebox.showerror("Error", "Por favor, complete todos los campos antes de continuar.")
+        return
+    
+    root.destroy()
+    preguntas_dos_path = project_root / "main" / "preguntasDos.py"
+    subprocess.run([sys.executable, str(preguntas_dos_path)])
 
 # Creación de la ventana de preguntas
 root = tk.Tk()
@@ -7,102 +27,40 @@ root.title("Encuesta de eficiencia de servicio")
 root.geometry("500x500")
 root.configure(bg="#7A98B2")
 
-# Preguntas de la encuesta de satisfacción: 
-# Variables para las respuestas de las preguntas
-pregunta1_var = tk.StringVar()
-pregunta2_var = tk.StringVar()
-pregunta3_var = tk.StringVar()
+# Variables para las respuestas
+tipo_fuente = ("Arial", 12)
+pregunta1_var, pregunta2_var, pregunta3_var = tk.StringVar(), tk.StringVar(), tk.StringVar()
 
-# El usuario ingresa sus datos: 
-def guardar_respuestas():
-    nombre = entry_nombre.get()
-    correo = entry_correo.get()
-    telefono = entry_telefono.get()
-    
-    # Verificar que todos los campos están completos
-    if not nombre or not correo or not telefono:
-        messagebox.showerror("Error", "Por favor, complete todos los campos.")
-        return
-    
-    respuestas = {
-        "nombre": nombre,
-        "correo": correo,
-        "telefono": telefono,
-        "respuestas_preguntas": [pregunta1_var.get(), pregunta2_var.get(), pregunta3_var.get()]
-    }
-    
-    # Aquí podrías guardar las respuestas en una base de datos o archivo
-    print(respuestas)
-    messagebox.showinfo("Gracias", "Gracias por completar la encuesta")
-    root.quit()  # Cerrar la ventana
+# Campos de entrada para los datos del usuario
+def crear_label(texto):
+    return tk.Label(root, text=texto, bg="#7A98B2", font=tipo_fuente)
 
-# Campos de entrada para los datos del usuario: 
-label_nombre = tk.Label(root, text="Nombre:", bg="#7A98B2", font=("Arial", 12))
-label_nombre.pack()
-entry_nombre = tk.Entry(root, width=40)
-entry_nombre.pack()
+def crear_entry():
+    return tk.Entry(root, width=40)
 
-label_correo = tk.Label(root, text="Correo Electrónico:", bg="#7A98B2", font=("Arial", 12))
-label_correo.pack()
-entry_correo = tk.Entry(root, width=40)
-entry_correo.pack()
+label_nombre, entry_nombre = crear_label("Nombre:"), crear_entry()
+label_correo, entry_correo = crear_label("Correo Electrónico:"), crear_entry()
+label_telefono, entry_telefono = crear_label("Número de Teléfono:"), crear_entry()
 
-label_telefono = tk.Label(root, text="Número de Teléfono:", bg="#7A98B2", font=("Arial", 12))
-label_telefono.pack()
-entry_telefono = tk.Entry(root, width=40)
-entry_telefono.pack()
+for label, entry in [(label_nombre, entry_nombre), (label_correo, entry_correo), (label_telefono, entry_telefono)]:
+    label.pack()
+    entry.pack()
 
-# Pregunta 1
-label_pregunta1 = tk.Label(root, text="¿Cómo calificarías la calidad general del servicio recibido?", bg="#7A98B2", font=("Arial", 12))
-label_pregunta1.pack(pady=15)
+# Preguntas con opciones de respuesta
+def crear_pregunta(texto, variable, opciones):
+    tk.Label(root, text=texto, bg="#7A98B2", font=tipo_fuente).pack(pady=10)
+    frame = tk.Frame(root, bg="#7A98B2")
+    frame.pack()
+    for texto, valor in opciones:
+        tk.Radiobutton(frame, text=texto, variable=variable, value=valor, bg="#7A98B2", font=("Arial", 10)).pack(side=tk.LEFT, padx=5)
 
-frame_pregunta1 = tk.Frame(root, bg="#7A98B2")
-frame_pregunta1.pack()
+crear_pregunta("¿Cómo calificarías la calidad general del servicio recibido?", pregunta1_var, [("Excelente", "Excelente"), ("Bueno", "Bueno"), ("Necesita mejorar", "Necesita mejorar")])
+crear_pregunta("¿El tiempo de espera fue razonable?", pregunta2_var, [("Sí, fue rápido", "Sí, fue rápido"), ("Aceptable", "Aceptable"), ("Muy largo", "Muy largo")])
+crear_pregunta("¿El personal fue amable y profesional?", pregunta3_var, [("Sí, muy amable y profesional", "Sí, muy amable y profesional"), ("Aceptable", "Aceptable"), ("No, no fue lo esperado", "No, no fue lo esperado")])
 
-opcion1_pregunta1 = tk.Radiobutton(frame_pregunta1, text="Excelente", variable=pregunta1_var, value="Excelente", bg="#7A98B2", font=("Arial", 10))
-opcion1_pregunta1.pack(side=tk.LEFT)
-
-opcion2_pregunta1 = tk.Radiobutton(frame_pregunta1, text="Bueno", variable=pregunta1_var, value="Bueno", bg="#7A98B2", font=("Arial", 10))
-opcion2_pregunta1.pack(side=tk.LEFT)
-
-opcion3_pregunta1 = tk.Radiobutton(frame_pregunta1, text="Necesita mejorar", variable=pregunta1_var, value="Necesita mejorar", bg="#7A98B2", font=("Arial", 10))
-opcion3_pregunta1.pack(side=tk.LEFT)
-
-# Pregunta 2
-label_pregunta2 = tk.Label(root, text="¿El tiempo de espera fue razonable?", bg="#7A98B2", font=("Arial", 12))
-label_pregunta2.pack(pady=10)
-
-frame_pregunta2 = tk.Frame(root, bg="#7A98B2")
-frame_pregunta2.pack()
-
-opcion1_pregunta2 = tk.Radiobutton(frame_pregunta2, text="Sí, fue rápido", variable=pregunta2_var, value="Sí, fue rápido", bg="#7A98B2", font=("Arial", 10))
-opcion1_pregunta2.pack(side=tk.LEFT)
-
-opcion2_pregunta2 = tk.Radiobutton(frame_pregunta2, text="Aceptable", variable=pregunta2_var, value="Aceptable", bg="#7A98B2", font=("Arial", 10))
-opcion2_pregunta2.pack(side=tk.LEFT)
-
-opcion3_pregunta2 = tk.Radiobutton(frame_pregunta2, text="Muy largo", variable=pregunta2_var, value="Muy largo", bg="#7A98B2", font=("Arial", 10))
-opcion3_pregunta2.pack(side=tk.LEFT)
-
-# Pregunta 3
-label_pregunta3 = tk.Label(root, text="¿El personal fue amable y profesional?", bg="#7A98B2", font=("Arial", 12))
-label_pregunta3.pack(pady=10)
-
-frame_pregunta3 = tk.Frame(root, bg="#7A98B2")
-frame_pregunta3.pack()
-
-opcion1_pregunta3 = tk.Radiobutton(frame_pregunta3, text="Sí, muy amable y profesional", variable=pregunta3_var, value="Sí, muy amable y profesional", bg="#7A98B2", font=("Arial", 10))
-opcion1_pregunta3.pack(side=tk.LEFT)
-
-opcion2_pregunta3 = tk.Radiobutton(frame_pregunta3, text="Aceptable", variable=pregunta3_var, value="Aceptable", bg="#7A98B2", font=("Arial", 10))
-opcion2_pregunta3.pack(side=tk.LEFT)
-
-opcion3_pregunta3 = tk.Radiobutton(frame_pregunta3, text="No, no fue lo esperado", variable=pregunta3_var, value="No, no fue lo esperado", bg="#7A98B2", font=("Arial", 10))
-opcion3_pregunta3.pack(side=tk.LEFT)
-
-# Botón de guardar la aplicación
-boton_enviar = tk.Button(root, text="Enviar Encuesta", command=guardar_respuestas, bg="#16CD7B", font=("Arial", 12))
-boton_enviar.pack()
+# Botón Siguiente
+btn_siguiente = tk.Button(root, text="Siguiente", command=validar_y_abrir_siguiente, bg="#16CD7B", font=tipo_fuente)
+btn_siguiente.pack(pady=20)
 
 # Mantener la ventana abierta
 root.mainloop()
