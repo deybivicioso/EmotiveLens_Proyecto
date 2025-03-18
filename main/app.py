@@ -28,7 +28,7 @@ def apply_theme():
         top_bar.configure(bg="#1C1C1C")
         settings_button.configure(bg="#444", fg="white")
     else:
-        root.configure(bg="white")
+        root.configure(bg="white") 
         top_bar.configure(bg="#7a98b2")
         settings_button.configure(bg="#ccc", fg="black")
 
