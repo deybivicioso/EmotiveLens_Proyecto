@@ -26,37 +26,34 @@ def apply_theme():
     if dark_mode:
         root.configure(bg="#2E2E2E")
         top_bar.configure(bg="#1C1C1C")
-        settings_button.configure(bg="#444", fg="white")
+        settings_menu_button.configure(bg="#444", fg="white")
     else:
         root.configure(bg="white") 
         top_bar.configure(bg="#7a98b2")
-        settings_button.configure(bg="#ccc", fg="black")
+        settings_menu_button.configure(bg="#ccc", fg="black")
 
 # Creación de la ventana
 root = tk.Tk()
 root.title("Inicio")
-root.geometry("400x500")
+root.state("zoomed")
 root.configure(bg="white")
 root.attributes('-alpha', 0)
 
 dark_mode = False  # Estado inicial del tema
 
 # Barra superior
-top_bar = tk.Frame(root, bg="#7a98b2", height=50)
+top_bar = tk.Frame(root, bg="#7A98B2", height=50)
 top_bar.pack(fill="x")
 
-# Botón de configuración
 def open_settings():
     config_window = tk.Toplevel()
-    config_window.title("Configuración")
+    config_window.title("Menu")
     config_window.geometry("400x300")
 
-    # Modo oscuro/claro
     tk.Label(config_window, text="Modo:").pack(pady=5)
     theme_button = tk.Button(config_window, text="Alternar Modo", command=toggle_theme)
     theme_button.pack(pady=5)
-    
-    # Selección de cámara
+
     tk.Label(config_window, text="Seleccionar Cámara:").pack(pady=5)
     camera_var = tk.StringVar()
     camera_list = get_camera_list()
@@ -64,14 +61,31 @@ def open_settings():
     if camera_list:
         camera_dropdown = ttk.Combobox(config_window, textvariable=camera_var, values=camera_list, state="readonly")
         camera_dropdown.pack(pady=5)
-        camera_dropdown.current(0)  # Selecciona la primera cámara por defecto
+        camera_dropdown.current(0)
     else:
         tk.Label(config_window, text="No se encontraron cámaras").pack()
 
-    config_window.mainloop()
+def open_historial_resultados():
+    root.destroy()
+    historial_path = project_root / "main" / "historial_resultados.py"
+    subprocess.run([sys.executable, str(historial_path)])
 
-settings_button = tk.Button(top_bar, text="⚙", font=("Arial", 12), bg="#ccc", fg="black", command=open_settings)
-settings_button.pack(side="left", padx=5, pady=5)
+def open_historial_seleccion():
+    root.destroy()
+    historial_path = project_root / "main" / "historial_seleccion.py"
+    subprocess.run([sys.executable, str(historial_path)])
+
+# Panel desplegable de configuración
+settings_menu_button = tk.Menubutton(top_bar, text="Menu", font=("Arial", 16), bg="#7A98B2", fg="white", relief="flat")
+settings_menu_button.pack(side="left", padx=5, pady=5)
+
+settings_menu = tk.Menu(settings_menu_button, tearoff=0)
+settings_menu.add_command(label="Ajustes de cámara y tema", command=open_settings)
+settings_menu.add_command(label="Historial de Resultados", command=open_historial_resultados)
+settings_menu.add_command(label="Historial de Seleccion", command=open_historial_seleccion)
+settings_menu_button.config(menu=settings_menu)
+
+
 
 # Mostrar el logo
 image_path = project_root / "assets" / "img" / "Emotive lens logo.png"  # Ruta correcta para la imagen
@@ -99,10 +113,12 @@ def fade_in(alpha=0):
         root.after(50, fade_in, alpha + 0.10)
 
 def open_acercade():
+    root.destroy()
     acercade_path = project_root / "main" / "acercade.py"  # Ruta correcta para acercade.py
     subprocess.run([sys.executable, str(acercade_path)])
 
 def open_iniciarencuesta():
+    root.destroy()
     iniciarencuesta_path = project_root / "main" / "seleccion.py" # Ruta correcta para seleccion.py
     subprocess.run([sys.executable, str(iniciarencuesta_path)])
 

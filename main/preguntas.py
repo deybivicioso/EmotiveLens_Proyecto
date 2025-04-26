@@ -1,66 +1,48 @@
-import tkinter as tk
-from tkinter import messagebox
-import subprocess
-import sys
+import webview
+import time
+import keyboard  # Necesitarás instalar este paquete
 from pathlib import Path
+from screeninfo import get_monitors
 
 # Obtener la carpeta principal del proyecto
 project_root = Path(__file__).resolve().parent.parent
 
-# Función para validar las respuestas antes de avanzar
-def validar_y_abrir_siguiente():
-    nombre = entry_nombre.get().strip()
-    correo = entry_correo.get().strip()
-    telefono = entry_telefono.get().strip()
-    
-    if not (nombre and correo and telefono and pregunta1_var.get() and pregunta2_var.get() and pregunta3_var.get()):
-        messagebox.showerror("Error", "Por favor, complete todos los campos antes de continuar.")
-        return
-    
-    root.destroy()
-    preguntas_dos_path = project_root / "main" / "preguntasDos.py"
-    subprocess.run([sys.executable, str(preguntas_dos_path)])
+url_encuesta = "https://www.surveymonkey.com/r/HD56TBB"
+url_resultados = "https://es.surveymonkey.com/results/SM-51F53HyLR20KS0Km7bpZwQ_3D_3D/"
 
-# Creación de la ventana de preguntas
-root = tk.Tk()
-root.title("Encuesta de eficiencia de servicio")
-root.geometry("500x500")
-root.configure(bg="#7A98B2")
+def control_boton(window):
+    time.sleep(3)  # Esperar a que la página cargue
 
-# Variables para las respuestas
-tipo_fuente = ("Arial", 12)
-pregunta1_var, pregunta2_var, pregunta3_var = tk.StringVar(), tk.StringVar(), tk.StringVar()
+    inject_button_js = """
+    if (!document.getElementById("verResultadosBtn")) {
+        let btn = document.createElement("button");
+        btn.id = "verResultadosBtn";
+        btn.innerText = "VER RESULTADOS";
+        btn.style.position = "fixed";
+        btn.style.bottom = "20px";
+        btn.style.right = "20px";
+        btn.style.padding = "10px 15px";
+        btn.style.fontSize = "16px";
+        btn.style.backgroundColor = "#16CD7B";
+        btn.style.color = "white";
+        btn.style.border = "none";
+        btn.style.borderRadius = "5px";
+        btn.style.zIndex = "9999";
+        btn.onclick = function(){
+            window.location.href = "%s";
+        };
+        document.body.appendChild(btn);
+    }
+    """ % url_resultados
 
-# Campos de entrada para los datos del usuario
-def crear_label(texto):
-    return tk.Label(root, text=texto, bg="#7A98B2", font=tipo_fuente)
+    window.evaluate_js(inject_button_js)
 
-def crear_entry():
-    return tk.Entry(root, width=40)
+    # Esperar a que el usuario presione "q" para cerrar la ventana
+    while True:
+        if keyboard.is_pressed('q'):  # Detecta la tecla 'q'
+            window.destroy()  # Cierra la ventana
+            break
 
-label_nombre, entry_nombre = crear_label("Nombre:"), crear_entry()
-label_correo, entry_correo = crear_label("Correo Electrónico:"), crear_entry()
-label_telefono, entry_telefono = crear_label("Número de Teléfono:"), crear_entry()
-
-for label, entry in [(label_nombre, entry_nombre), (label_correo, entry_correo), (label_telefono, entry_telefono)]:
-    label.pack()
-    entry.pack()
-
-# Preguntas con opciones de respuesta
-def crear_pregunta(texto, variable, opciones):
-    tk.Label(root, text=texto, bg="#7A98B2", font=tipo_fuente).pack(pady=10)
-    frame = tk.Frame(root, bg="#7A98B2")
-    frame.pack()
-    for texto, valor in opciones:
-        tk.Radiobutton(frame, text=texto, variable=variable, value=valor, bg="#7A98B2", font=("Arial", 10)).pack(side=tk.LEFT, padx=5)
-
-crear_pregunta("¿Cómo calificarías la calidad general del servicio recibido?", pregunta1_var, [("Excelente", "Excelente"), ("Bueno", "Bueno"), ("Necesita mejorar", "Necesita mejorar")])
-crear_pregunta("¿El tiempo de espera fue razonable?", pregunta2_var, [("Sí, fue rápido", "Sí, fue rápido"), ("Aceptable", "Aceptable"), ("Muy largo", "Muy largo")])
-crear_pregunta("¿El personal fue amable y profesional?", pregunta3_var, [("Sí, muy amable y profesional", "Sí, muy amable y profesional"), ("Aceptable", "Aceptable"), ("No, no fue lo esperado", "No, no fue lo esperado")])
-
-# Botón Siguiente
-btn_siguiente = tk.Button(root, text="Siguiente", command=validar_y_abrir_siguiente, bg="#16CD7B", font=tipo_fuente)
-btn_siguiente.pack(pady=20)
-
-# Mantener la ventana abierta
-root.mainloop()
+if __name__ == '__main__':
+    window = webview.create_window("Encuesta", url_encuesta)
+    webview.start(func=control_boton, args=(window,))

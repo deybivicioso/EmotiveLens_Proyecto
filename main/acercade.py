@@ -54,13 +54,30 @@ developers = [
 root = tk.Tk()
 root.title("Acerca de Nosotros")
 root.configure(bg="#7A98B2")
+root.state("zoomed")
 
 title_label = tk.Label(root, text="Acerca de Nosotros", font=("Arial", 20, "bold"), fg="white", bg="#7A98B2")
 title_label.pack(pady=10)
 
-
 frame = tk.Frame(root, bg="#7A98B2")
-frame.pack()
+frame.pack(fill="both", expand=True)
+
+canvas = tk.Canvas(frame, bg="#7A98B2", highlightthickness=0)
+scrollbar = tk.Scrollbar(frame, orient="vertical", command=canvas.yview)
+canvas.configure(yscrollcommand=scrollbar.set)
+
+scrollbar.pack(side="right", fill="y")
+canvas.pack(side="left", fill="both", expand=True)
+
+scrollable_frame = tk.Frame(canvas, bg= "#7A98B2")
+
+canvas_window = canvas.create_window((0, 0), window=scrollable_frame, anchor="n")
+
+def on_configure(event):
+    canvas.configure(scrollregion=canvas.bbox("all"))
+    canvas.itemconfig(canvas_window, width=canvas.winfo_width())
+
+scrollable_frame.bind("<Configure>", on_configure)
 
 # Ajustes de tamaño de las tarjetas
 CARD_WIDTH = 310  
@@ -71,7 +88,7 @@ image_refs = []
 
 # Cargar datos en la interfaz en filas de 2
 for i in range(0, len(developers), 2):
-    row_frame = tk.Frame(frame, bg="#7A98B2")  
+    row_frame = tk.Frame(scrollable_frame, bg="#7A98B2")  
     row_frame.pack(pady=10)  
 
     for j in range(2):
@@ -79,7 +96,7 @@ for i in range(0, len(developers), 2):
             dev = developers[i + j]
 
             card = tk.Frame(row_frame, bg="white", padx=10, pady=10, bd=2, relief="raised", width=CARD_WIDTH, height=CARD_HEIGHT)
-            card.pack(side="left", padx=15) 
+            card.pack(side="left", padx=10) 
             card.pack_propagate(False) 
 
             name_label = tk.Label(card, text=dev["name"], font=("Arial", 14, "bold"), fg="#005BAC", bg="white", wraplength=250)
@@ -90,6 +107,11 @@ for i in range(0, len(developers), 2):
 
             bio_label = tk.Label(card, text=dev["bio"], font=("Arial", 10), wraplength=250, fg="#333333", bg="white")
             bio_label.pack()
+
+def _on_mousewheel(event):
+    canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
+
+canvas.bind_all("<MouseWheel>", _on_mousewheel)
 
 # Ejecutar aplicación
 root.mainloop()

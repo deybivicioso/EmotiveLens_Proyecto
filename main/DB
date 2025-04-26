@@ -1,0 +1,9 @@
+use scanner;
+
+CREATE TABLE resultados (
+	id INTEGER PRIMARY KEY AUTO_INCREMENT,
+    fecha_hora TEXT NOT NULL,
+    emocion TEXT NOT NULL,
+    cantidad INTEGER NOT NULL,
+    emocion_predominante TEXT NOT NULL
+);

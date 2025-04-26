@@ -18,7 +18,7 @@ def redirect():
 # Ventana principal
 root = tk.Tk()
 root.title("")
-root.geometry("400x400")
+root.state("zoomed")
 root.configure(bg="white")
 
 # Imagen
